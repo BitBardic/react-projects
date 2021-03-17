@@ -1,12 +1,8 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import SpeakerContext from './SpeakerContext';
 
-const Speakers = () => {  
-    const speakers = [
-        { imageSrc: 'speaker-component-1124', name: 'Douglas Crockford' },
-        { imageSrc: 'speaker-component-1530', name: 'Tamara Baker' },
-        { imageSrc: 'speaker-component-10803', name: 'Eugene Chuvyrov'}
-    ];
-
+const Speakers = () => { 
+    const speakers = useContext(SpeakerContext); 
     return (
         <div>
             {speakers.map(({ imageSrc, name }) => {
