@@ -3,12 +3,13 @@ import React from 'react';
 import SpeakerFavoriteButton from '../SpeakerFavoriteButton/SpeakerFavoriteButton';
 import SpeakerImage from '../SpeakerImage/SpeakerImage';
 
-const Speaker = ({ id, firstName, lastName, bio, isFavorite }) => (
+const Speaker = ({ id, firstName, lastName, bio, isFavorite, onFavoriteToggle }) => (
     <div className="rounded overflow-hidden shadow-lg p-6" key={id}>
       <div className="grid grid-cols-4 mb-6">
         <div className="font-bold text-lg col-span-3">{`${firstName} ${lastName}`}</div>
         <div className="flex justify-end">
-          <SpeakerFavoriteButton isFavorite={isFavorite} />
+          <SpeakerFavoriteButton isFavorite={isFavorite} 
+            onFavoriteToggle={onFavoriteToggle}/>
         </div>
       </div>
       <div className="mb-6">
