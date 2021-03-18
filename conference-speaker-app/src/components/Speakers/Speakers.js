@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import SpeakerSearchBar from '../SpeakerSearchBar/SpeakerSearchBar';
+import Speaker from '../Speaker/Speaker';
+
 const Speakers = () => {
   const speakers = [
     {
@@ -38,35 +42,20 @@ const Speakers = () => {
         'Eugene Chuvyrov is  a Senior Cloud Architect at Microsoft. He works directly with both startups and enterprises to enable their solutions in Microsoft cloud, and to make Azure better as a result of this work with partners.',
     },
   ];
+
+  const [searchQuery, setSearchQuery] = useState("");
+
   return (
     <div>
-      <div className="mb-6 ">
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="username"
-          type="text"
-          placeholder="Search by name"
-        />
-      </div>
+      <SpeakerSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <div className="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-12">
-        {speakers.map(({ id, firstName, lastName, bio, isFavorite }) => (
-          <div className="rounded overflow-hidden shadow-lg p-6" key={id}>
-            <div className="grid grid-cols-4 mb-6">
-              <div className="font-bold text-lg col-span-3">{`${firstName} ${lastName}`}</div>
-              <div className="flex justify-end">
-                <div
-                  className={isFavorite ? 'heartredbutton' : 'heartdarkbutton'}
-                ></div>
-              </div>
-            </div>
-            <div className="mb-6">
-              <img
-                src={`/speakers/speaker-${id}.jpg`}
-                alt={`${firstName} ${lastName}`}
-              />
-            </div>
-            <div className="text-gray-600">{bio.substr(0, 70) + '...'}</div>
-          </div>
+        {speakers
+        .filter((rec) => {
+            const targetString = `${rec.firstName} ${rec.lastName}`.toLowerCase();
+            return searchQuery.length === 0 ? true : targetString.includes(searchQuery.toLowerCase());
+        })
+        .map((speaker) => (
+            <Speaker key={speaker.id} {...speaker} />
         ))}
       </div>
     </div>
