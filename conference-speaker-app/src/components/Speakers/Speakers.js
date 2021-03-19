@@ -4,60 +4,53 @@ import axios from 'axios';
 import SpeakerSearchBar from '../SpeakerSearchBar/SpeakerSearchBar';
 import Speaker from '../Speaker/Speaker';
 
+import requestReducer from '../../reducers/request';
+
+import {
+  GET_ALL_FAILURE,
+  GET_ALL_SUCCESS,
+  PUT_FAILURE,
+  PUT_SUCCESS,
+} from '../../actions/request';
+
+const REQUEST_STATUS = {
+  LOADING: 'loading',
+  SUCCESS: 'success',
+  ERROR: 'error',
+};
+
 const Speakers = () => {
-  
-  function toggleSpeakerFavorite(speakerRec) {
-    return {
-        ...speakerRec,
-        isFavorite: !speakerRec.isFavorite,
-    };
-  }
-
-  async function onFavoriteToggleHandler(speakerRec) {
-    const toggledSpeakerRec = toggleSpeakerFavorite(speakerRec);
-    const speakerIndex = speakers.map((speaker) => speaker.id).indexOf(speakerRec.id);
-
+  const onFavoriteToggleHandler = async (speakerRec) => {
     try {
-        await axios.put(`http://localhost:4000/speakers'/${speakerRec.id}`, toggledSpeakerRec)
-        setSpeakers
-        ([...speakers.slice(0,speakerIndex), toggledSpeakerRec, ...speakers.slice(speakerIndex + 1)]);
-      } catch (error) {
-        setStatus(REQUEST_STATUS.ERROR);
-        setError(error);
+          const toggledSpeakerRec = {
+            ...speakerRec,
+              isFavorite: !speakerRec.isFavorite,
+          };
+          await axios.put(
+            `http://localhost:4000/speakers/${speakerRec.id}`,
+            toggledSpeakerRec,
+          );
+          dispatch({
+            type: PUT_SUCCESS,
+            record: toggledSpeakerRec,
+          });   
+      } catch (e) {
+        dispatch({
+          type: PUT_FAILURE,
+          error: e,
+        });
       }
-  }
-
-  const REQUEST_STATUS = {
-    "LOADING": "loading",
-    "SUCCESS": "success",
-    "ERROR": "error"
   };
 
-  const reducer = (state, action) => {
-    switch(action.type) {
-      case 'GET_ALL_SUCCESS':
-        return {
-          ...state,
-          status: REQUEST_STATUS.SUCCESS,
-          speakers : action.speakers,
-        };
-      case 'UPDATE_STATUS':
-        return {
-          ...state,
-          status: action.status
-        };
-    }
-  };
-
-  const [{ speakers, status }, dispatch] = useReducer(reducer, {
-    status: REQUEST_STATUS.LOADING,
-    speakers: []
-  });
-
-  const [searchQuery, setSearchQuery] = useState("");
-  //const [speakers, setSpeakers] = useState([]);
-  //const [status, setStatus] = useState(REQUEST_STATUS.LOADING);
-  const [error, setError] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [{ records: speakers, status, error }, dispatch] = useReducer(
+    requestReducer, 
+    {
+      records: [],
+      status: REQUEST_STATUS.LOADING,
+      error: null,
+    },
+  );
 
   useEffect(() => {
     const fetchData = async() => {
@@ -65,21 +58,19 @@ const Speakers = () => {
           const response = await axios.get("http://localhost:4000/speakers/");
 
           dispatch({
-            speakers: response.data,
-            type: "GET_ALL_SUCCESS"
+            type: GET_ALL_SUCCESS,
+            records: response.data,       
           });
-
-      } catch (error) {
-
+      } catch (e) {
+          console.log('Loading data error', e);
           dispatch({
-            status: REQUEST_STATUS.ERROR,
-            type: "UPDATE_STATUS"
+            type: GET_ALL_FAILURE,
+            error: e,     
           });
-          setError(error);
       }
     }
     fetchData();
-  }, [status]);
+  }, []);
 
   const success = status === REQUEST_STATUS.SUCCESS;
   const isLoading = status === REQUEST_STATUS.LOADING;
@@ -87,26 +78,37 @@ const Speakers = () => {
 
   return (
     <div>
-      <SpeakerSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <SpeakerSearchBar 
+        searchQuery={searchQuery} 
+        setSearchQuery={setSearchQuery} 
+      />
       {isLoading && <div>Loading...</div>}
       {hasErrored && (
         <div>
-          Loading error... Is the json-server running? (try "npm run json-server" at terminal prompt)
+          Loading error... Is the json-server running? (try "npm run 
+          json-server" at terminal prompt)
           <br />
           <b> ERROR: {error.message}</b>
         </div>
       )}
-      {success && (<div className="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-12">
+      {success && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-12">
         {speakers
         .filter((rec) => {
             const targetString = `${rec.firstName} ${rec.lastName}`.toLowerCase();
-            return searchQuery.length === 0 ? true : targetString.includes(searchQuery.toLowerCase());
+            return searchQuery.length === 0 
+              ? true 
+              : targetString.includes(searchQuery.toLowerCase());
         })
         .map((speaker) => (
-            <Speaker key={speaker.id} {...speaker} 
-                onFavoriteToggle= {() => onFavoriteToggleHandler(speaker)} />
+            <Speaker 
+              key={speaker.id} 
+              {...speaker} 
+              onFavoriteToggle= {() => onFavoriteToggleHandler(speaker)}
+            />
         ))}
-      </div>)}
+      </div>
+      )}
     </div>
   );
 };
