@@ -7,6 +7,9 @@ import {REQUEST_STATUS} from '../../reducers/request';
 
 import withRequest from '../HOCs/withRequest';
 
+import withSpecialMessage from '../HOCs/withSpecialMessage';
+import { compose } from 'recompose';
+
 /* import {
   GET_ALL_FAILURE,
   GET_ALL_SUCCESS,
@@ -20,7 +23,7 @@ import withRequest from '../HOCs/withRequest';
   ERROR: 'error',
 };*/
 
-const Speakers = ({ records: speakers, status, error, put }) => {
+const Speakers = ({ records: speakers, status, error, put, bgColor, specialMessage }) => {
   const onFavoriteToggleHandler = async (speakerRec) => {
     put({
       ...speakerRec,
@@ -82,11 +85,22 @@ const Speakers = ({ records: speakers, status, error, put }) => {
   const hasErrored = status === REQUEST_STATUS.ERROR;
 
   return (
-    <div>
+    <div className={bgColor}>
       <SpeakerSearchBar 
         searchQuery={searchQuery} 
         setSearchQuery={setSearchQuery} 
       />
+
+      {specialMessage && specialMessage.length > 0 && (
+        <div
+          className='bg-orange-100 border-1-8 border-orange-500 text-orange-700 p-4 text-2xl'
+          role="alert"
+        >
+          <p className="font-bold">Special Message</p>
+          <p>{specialMessage}</p>
+        </div>
+      )}
+      
       {isLoading && <div>Loading...</div>}
       {hasErrored && (
         <div>
@@ -117,4 +131,9 @@ const Speakers = ({ records: speakers, status, error, put }) => {
     </div>
   );
 };
-export default withRequest('http://localhost:4000', 'speakers')(Speakers);
+// export default withSpecialMessage(
+//   withRequest('http://localhost:4000', 'speakers')(Speakers));
+export default compose(
+  withRequest('http://localhost:4000', 'speakers'),
+  withSpecialMessage()
+)(Speakers);

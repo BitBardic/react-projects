@@ -9,7 +9,7 @@ import {
   GET_ALL_FAILURE,
 } from '../../actions/request';
 
-const withRequest = (baseUrl, routeName) => (Component) => () => {
+const withRequest = (baseUrl, routeName) => (Component) => (props) => {
   const [{ records, status, error }, dispatch] = useReducer(requestReducer, {
     status: REQUEST_STATUS.LOADING,
     records: [],
@@ -37,7 +37,7 @@ const withRequest = (baseUrl, routeName) => (Component) => () => {
     fetchData();
   }, [baseUrl, routeName]);
 
-  const props = {
+  const propsLocal = {
     records,
     status,
     error,
@@ -57,7 +57,7 @@ const withRequest = (baseUrl, routeName) => (Component) => () => {
     },
   };
 
-  return <Component {...props}></Component>;
+  return <Component {...props} {...propsLocal}></Component>;
 };
 
 export default withRequest;
