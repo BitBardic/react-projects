@@ -1,27 +1,32 @@
-import React, { useState, useEffect, useReducer } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 
 import SpeakerSearchBar from '../SpeakerSearchBar/SpeakerSearchBar';
 import Speaker from '../Speaker/Speaker';
 
-import requestReducer from '../../reducers/request';
+import {REQUEST_STATUS} from '../../reducers/request';
 
-import {
+import withRequest from '../HOCs/withRequest';
+
+/* import {
   GET_ALL_FAILURE,
   GET_ALL_SUCCESS,
   PUT_FAILURE,
   PUT_SUCCESS,
-} from '../../actions/request';
+} from '../../actions/request'; */
 
-const REQUEST_STATUS = {
+/*const REQUEST_STATUS = {
   LOADING: 'loading',
   SUCCESS: 'success',
   ERROR: 'error',
-};
+};*/
 
-const Speakers = () => {
+const Speakers = ({ records: speakers, status, error, put }) => {
   const onFavoriteToggleHandler = async (speakerRec) => {
-    try {
+    put({
+      ...speakerRec,
+        isFavorite: !speakerRec.isFavorite,
+    });
+    /* try {
           const toggledSpeakerRec = {
             ...speakerRec,
               isFavorite: !speakerRec.isFavorite,
@@ -39,20 +44,20 @@ const Speakers = () => {
           type: PUT_FAILURE,
           error: e,
         });
-      }
+      } */
   };
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [{ records: speakers, status, error }, dispatch] = useReducer(
+ /* const [{ records: speakers, status, error }, dispatch] = useReducer(
     requestReducer, 
     {
       records: [],
       status: REQUEST_STATUS.LOADING,
       error: null,
     },
-  );
+  ); */
 
-  useEffect(() => {
+ /* useEffect(() => {
     const fetchData = async() => {
       try {
           const response = await axios.get("http://localhost:4000/speakers/");
@@ -70,7 +75,7 @@ const Speakers = () => {
       }
     }
     fetchData();
-  }, []);
+  }, []); */
 
   const success = status === REQUEST_STATUS.SUCCESS;
   const isLoading = status === REQUEST_STATUS.LOADING;
@@ -112,4 +117,4 @@ const Speakers = () => {
     </div>
   );
 };
-export default Speakers;
+export default withRequest('http://localhost:4000', 'speakers')(Speakers);

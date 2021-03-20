@@ -6,7 +6,7 @@
       "lastName": "Baker",
       "sat": false,
       "sun": true,
-      "isFavorite": true,
+      "isFavorite": false,
       "bio": "Tammy has held a number of executive and management roles over the past 15 years, including VP engineering Roles at Molekule Inc., Cantaloupe Systems, E-Color, and Untangle Inc."
     },
     {
@@ -58,7 +58,7 @@
       "id": 1725,
       "firstName": "Brad",
       "lastName": "Irby",
-      "isFavorite": false,
+      "isFavorite": true,
       "bio": "Brad is an accomplished .NET software architect specializing in Domain Driven Design and Event Driven Architectures.",
       "sat": true,
       "sun": false
